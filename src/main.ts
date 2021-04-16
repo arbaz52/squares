@@ -34,6 +34,9 @@ const lines: ILine[] = [];
 
 let closest: IPointWithDistance | undefined;
 
+const getAngle = (p1: IPoint, p2: IPoint): number =>
+  Math.atan((p2.y - p1.y) / (p2.x - p1.x));
+
 const getDistance = (p1: IPoint, p2: IPoint): number =>
   Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
 
@@ -137,6 +140,13 @@ const handleMouseUp = (ev: MouseEvent) => {
           player: currentPlayer,
         });
         currentPlayer = currentPlayer === "red" ? "green" : "red";
+
+        const angle = Math.floor(Math.abs(getAngle(startingPoint, closest)));
+        if (angle > 0) {
+          console.debug("vertical line");
+        } else {
+          console.debug("horizontal line");
+        }
       }
     }
     startingPoint = undefined;
