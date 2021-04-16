@@ -3,6 +3,9 @@ import "./style.css";
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
+type IPlayer = "red" | "green";
+let currentPlayer: IPlayer = "red";
+
 const columns = 5;
 const padding = 24;
 
@@ -24,11 +27,15 @@ let startingPoint: IPoint | undefined;
 interface ILine {
   start: IPoint;
   end: IPoint;
+  player: IPlayer;
 }
 
 const lines: ILine[] = [];
 
 let closest: IPointWithDistance | undefined;
+
+const getDistance = (p1: IPoint, p2: IPoint): number =>
+  Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
 
 const draw = () => {
   requestAnimationFrame(draw);
@@ -39,9 +46,10 @@ const draw = () => {
 
   closest = undefined;
 
-  for (let { end, start } of lines) {
+  for (let { end, start, player } of lines) {
     ctx.beginPath();
-    ctx.strokeStyle = "black";
+    ctx.strokeStyle = player;
+    ctx.lineWidth = 4;
 
     ctx.moveTo(start.x, start.y);
     ctx.lineTo(end.x, end.y);
@@ -122,11 +130,14 @@ const handleMouseUp = (ev: MouseEvent) => {
         Math.pow(startingPoint.x - closest.x, 2) +
           Math.pow(startingPoint.y - closest.y, 2)
       );
-      if (Math.floor(distanceBetweenPoints) <= cellSize)
+      if (Math.floor(distanceBetweenPoints) <= cellSize) {
         lines.push({
           start: startingPoint,
           end: closest,
+          player: currentPlayer,
         });
+        currentPlayer = currentPlayer === "red" ? "green" : "red";
+      }
     }
     startingPoint = undefined;
   }
